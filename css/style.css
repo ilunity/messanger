@@ -1,0 +1,305 @@
+@import "../css/normalize_style.css";
+@import url("https://fonts.googleapis.com/css2?family=Roboto&display=swap");
+body {
+  font-family: Roboto, sans-serif;
+}
+
+.container {
+  width: 320px;
+  height: 533px;
+  margin: 100px auto 0;
+  border: 1px solid black;
+  background-color: #535353;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.main-window {
+  width: 100%;
+  height: 100%;
+  padding: 8px;
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.main-window_nonactive {
+  display: none;
+}
+.main-window__header {
+  width: 100%;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 16px;
+}
+.main-window__settings-btn {
+  border: 1px solid black;
+  padding: 5px;
+}
+.main-window__exit-btn {
+  border: 1px solid black;
+  padding: 5px;
+}
+.main-window__messages-wrapper {
+  height: 100%;
+  width: 100%;
+  overflow-y: scroll;
+  margin-bottom: 8px;
+  border: 1px solid black;
+}
+.main-window__messages {
+  width: 100%;
+  min-height: 100%;
+}
+.main-window__message-form {
+  width: 100%;
+}
+
+.messages {
+  padding: 8px;
+  display: flex;
+  justify-content: end;
+  flex-direction: column;
+  align-items: start;
+}
+
+.message-item {
+  font-size: 16px;
+  line-height: 19px;
+  max-width: 260px;
+  min-height: 52px;
+  height: auto;
+  padding: 8px;
+  margin-bottom: 8px;
+  overflow-wrap: break-word;
+  background-color: #F7F7F7;
+  border-radius: 3px;
+  display: flex;
+  flex-direction: column;
+}
+.message-item_my-message {
+  align-self: end;
+}
+.message-item_delivered {
+  background-color: #E5E5E5;
+}
+.message-item__time {
+  align-self: end;
+}
+
+.message-form {
+  display: flex;
+  justify-content: space-between;
+}
+.message-form__input {
+  font-size: 16px;
+  line-height: 19px;
+  width: 267px;
+  height: 32px;
+  padding: 7px;
+  border: 1px solid black;
+  overflow-wrap: break-word;
+  overflow: hidden;
+  resize: none;
+}
+
+.send-btn {
+  width: 29px;
+  height: 32px;
+  border: 1px solid black;
+}
+.send-btn img {
+  width: 100%;
+  height: 100%;
+}
+
+.close-btn {
+  width: 19px;
+  height: 19px;
+  padding: 2px;
+}
+.close-btn img {
+  width: 100%;
+  height: 100%;
+}
+
+.settings-window {
+  width: 273px;
+  height: 319px;
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.settings-window_nonactive {
+  display: none;
+}
+.settings-window__header {
+  width: 273px;
+  height: 50px;
+  padding: 15px;
+  margin-bottom: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid black;
+}
+.settings-window__wrapper {
+  width: 240px;
+}
+.settings-window__settings-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.settings-element {
+  margin-bottom: 15px;
+}
+.settings-element:last-child {
+  margin-bottom: 0;
+}
+.settings-element__title {
+  margin-bottom: 8px;
+}
+.settings-element__form {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+.settings-element__input {
+  line-height: 19px;
+  width: 202px;
+  height: 32px;
+  padding: 7px;
+  border: 1px solid black;
+  text-align: center;
+}
+.settings-element__confirm-btn {
+  height: 32px;
+  width: 32px;
+  padding: 3px;
+  border: 1px solid black;
+}
+.settings-element__confirm-btn img {
+  width: 100%;
+  height: 100%;
+}
+.settings-element__btn {
+  line-height: 19px;
+  width: 202px;
+  height: 32px;
+  padding: 7px;
+  border: 1px solid black;
+}
+
+.authorization-window {
+  width: 273px;
+  height: 319px;
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.authorization-window_nonactive {
+  display: none;
+}
+.authorization-window__header {
+  width: 273px;
+  height: 50px;
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid black;
+}
+.authorization-window__wrapper {
+  width: 240px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+.authorization-window__parameters-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.authorization-parameter {
+  margin-bottom: 15px;
+}
+.authorization-parameter:last-child {
+  margin-bottom: 0;
+}
+.authorization-parameter__title {
+  margin-bottom: 8px;
+}
+.authorization-parameter__form {
+  display: flex;
+  flex-direction: column;
+}
+.authorization-parameter__input {
+  width: 100%;
+  height: 32px;
+  margin-bottom: 7px;
+  padding: 7px;
+  line-height: 19px;
+  border: 1px solid black;
+}
+.authorization-parameter__get-code-btn {
+  width: 120px;
+  height: 32px;
+  border: 1px solid black;
+}
+
+.confirm-window {
+  width: 273px;
+  height: 319px;
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.confirm-window_nonactive {
+  display: none;
+}
+.confirm-window__header {
+  width: 273px;
+  height: 50px;
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid black;
+}
+.confirm-window__wrapper {
+  width: 240px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+
+.code-confirm__title {
+  margin-bottom: 8px;
+}
+.code-confirm__form {
+  display: flex;
+  flex-direction: column;
+}
+.code-confirm__input {
+  width: 100%;
+  height: 32px;
+  margin-bottom: 7px;
+  padding: 7px;
+  line-height: 19px;
+  border: 1px solid black;
+}
+.code-confirm__get-code-btn {
+  width: 120px;
+  height: 32px;
+  border: 1px solid black;
+}
+
+/*# sourceMappingURL=style.css.map */

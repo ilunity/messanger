@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<title>Title</title>
+		<link rel="stylesheet" href="css/style.css">
+	</head>
+	<body>
+		<div class="container">
+			<div class="main-window main-window_nonactive">
+				<div class="main-window__header">
+					<button class="main-window__settings-btn">Настройки</button>
+					<button class="main-window__exit-btn">Выйти</button>
+				</div>
+				<div class="main-window__messages-wrapper">
+					<div class="main-window__messages messages">
+						<template id="message-tmp">
+							<div class="messages__message-item message-item">
+								<div class="message-item__text">
+									<span class="message-item__author"></span><span>: </span><br>
+									<div class="message-item__message"></div>
+								</div>
+								<div class="message-item__time"></div>
+							</div>
+						</template>
+					</div>
+				</div>
+				<form onsubmit="return false;" class="main-window__message-form message-form">
+					<textarea class="message-form__input message-input" placeholder="сообщение.."></textarea>
+					<button class="message-form__send-btn send-btn">
+						<img src="img/icons/send-message-icon.svg" alt="Кнопка отправить сообщение">
+					</button>
+				</form>
+			</div>
+			<div class="settings-window settings-window_nonactive">
+				<div class="settings-window__header">
+					<div class="settings-window__title">Настройки</div>
+					<button class="settings-window__close-btn close-btn">
+						<img src="img/icons/close-icon.svg" alt="Кнопка закрыть окно настроек">
+					</button>
+				</div>
+				<div class="settings-window__wrapper">
+					<ul class="settings-window__settings-list">
+						<li class="settings-window__settings-element settings-element name-settings">
+							<div class="settings-element__title">Имя в чате</div>
+							<form onsubmit="return false; "class="settings-element__form name-settings__form">
+								<input class="settings-element__input name-settings__input">
+								<button class="settings-element__confirm-btn confirm-btn">
+									<img src="img/icons/confirm-icon.svg" alt="Кнопка сохранить новое имя">
+								</button>
+							</form>
+						</li>
+					</ul>
+				</div>
+			</div>
+			<div class="authorization-window authorization-window_nonactive">
+				<div class="authorization-window__header">
+					<div class="authorization-window__title">Авторизация</div>
+					<button class="authorization-window__close-btn close-btn">
+						<img src="img/icons/close-icon.svg" alt="Кнопка закрыть окно авторизации">
+					</button>
+				</div>
+				<div class="authorization-window__wrapper">
+					<ul class="authorization-window__parameters-list">
+						<li class="authorization-window__authorization-parameter authorization-parameter email-parameter">
+							<div class="authorization-parameter__title">Почта:</div>
+							<form onsubmit="return false;" class="authorization-parameter__form email-parameter__form">
+								<input class="authorization-parameter__input email-parameter__input">
+								<button class="authorization-parameter__get-code-btn">
+									Получить код
+								</button>
+							</form>
+						</li>
+					</ul>
+				</div>
+			</div>
+			<div class="confirm-window confirm-window_nonactive">
+				<div class="confirm-window__header">
+					<div class="confirm-window__title">Подтверждение</div>
+					<button class="confirm-window__close-btn close-btn">
+						<img src="img/icons/close-icon.svg" alt="Кнопка закрыть окно авторизации">
+					</button>
+				</div>
+				<div class="confirm-window__wrapper">
+					<div class="confirm-window__code-confirm code-confirm">
+						<div class="code-confirm__title">Код:</div>
+						<form onsubmit="return false;" class="code-confirm__form">
+							<input class="code-confirm__input">
+							<button class="code-confirm__get-code-btn">
+								Войти
+							</button>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+		<script type="module" src="js/main.js"></script>
+	</body>
+</html>
