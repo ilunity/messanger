@@ -1,10 +1,19 @@
 import {CreateMessageElement, UI} from "./view.js";
 import {getCookie, setCookie, deleteCookie} from "./cookieManager.js";
+import {sendServerRequest, SendTokenRequest, tokenGetRequest, changeNameRequest, messageHistoryRequest} from "./network.js";
 
 const NAME_IN_CHAT = 'Я';
 const TOKEN = 'token';
 let currentUserName = '';
 let currentWindow;
+
+function showMessage(messageOptions) {
+    const message = new CreateMessageElement(messageOptions);
+    const messageNode = message.mainElement;
+
+    UI.mainWindow.messagesList.append(messageNode);
+    UI.mainWindow.messageWrapper.scrollToEnd();
+}
 
 function sendMessage() {
     const messageOptions = {
@@ -14,11 +23,17 @@ function sendMessage() {
     }
     UI.mainWindow.messageForm.resetForm();
 
-    const message = new CreateMessageElement(messageOptions);
-    const messageNode = message.mainElement;
+    showMessage();
+}
 
-    UI.mainWindow.messagesList.append(messageNode);
-    UI.mainWindow.messageWrapper.scrollToEnd();
+async function showMessageHistory() {
+    const callbackOptions = {
+        async onSuccess(response) {
+            const responseJSON = await response.json();
+            alert(JSON.stringify(responseJSON));
+        }
+    }
+    await messageHistoryRequest(callbackOptions);
 }
 
 function getCurrentTime() {
@@ -44,21 +59,15 @@ function toggleWindow(window) {
 }
 
 async function authorizationHandler() {
-    const email = UI.authorizationWindow.authorizationList.email.getEmail()
+    const emailName = UI.authorizationWindow.authorizationList.email.getEmail()
     UI.authorizationWindow.authorizationList.email.resetForm();
 
-    const emailJSON = JSON.stringify({email: email});
-    try {
-        let response = await fetch( 'https://chat1-341409.oa.r.appspot.com/api/user', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json;charset=utf-8'
-            },
-            body: emailJSON,
-        })
-    } catch (error) {
-        alert(error);
+    const callbackOptions = {
+        onSuccess() {
+            alert('Код отправлен.');
+        }
     }
+    await SendTokenRequest(emailName, callbackOptions);
 
     toggleWindow(UI.codeConfirmWindow);
 }
@@ -67,62 +76,43 @@ async function codeConfirmHandler() {
     setCookie(TOKEN, UI.codeConfirmWindow.form.getText());
     UI.codeConfirmWindow.form.resetForm();
 
-    const response = await getTokenResponse();
-    if (response.ok) {
-        successfulCodeConfirmHandler();
-    } else {
-        alert('Неверный токен. Попробуйте еще раз.');
-    }
+    const callbackOptions = {
+        onSuccess(response) {
+            if (response.ok) {
+                successfulCodeConfirmHandler(response);
+            } else {
+                alert('Неверный токен. Попробуйте еще раз.');
+            }
+        },
+    };
+    await tokenGetRequest(callbackOptions);
 }
 
-function successfulCodeConfirmHandler(tokenResponseJSON) {
+async function successfulCodeConfirmHandler(tokenResponse) {
+    const responseJSON = await tokenResponse.json();
+    await showMessageHistory();
     toggleWindow(UI.mainWindow)
 
-    currentUserName = tokenResponseJSON.name;
+    currentUserName = responseJSON.name;
     UI.settingsWindow.settingsList.chatName.setUserName(currentUserName);
 }
 
 async function changeName() {
-    const token = getCookie(TOKEN);
-
     const newName = UI.settingsWindow.settingsList.chatName.getUserName();
-    const bodyJSON = JSON.stringify({name: newName});
-    try {
-        let response = await fetch('https://chat1-341409.oa.r.appspot.com/api/user', {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json;charset=utf-8',
-                'Authorization': `Bearer ${token}`,
-            },
-            body: bodyJSON,
-        })
-        if (response.ok) {
-            currentUserName = name;
-            alert('Имя изменено');
-        } else {
-            UI.settingsWindow.settingsList.chatName.setUserName(currentUserName);
-            alert('Что-то пошло не так');
-        }
-    } catch (error) {
-        alert(error);
-    }
-}
 
-async function getTokenResponse() {
-    const token = getCookie(TOKEN);
-
-    try {
-        const response = await fetch('https://chat1-341409.oa.r.appspot.com/api/user/me', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json;charset=utf-8',
-                'Authorization': `Bearer ${token}`,
+    const callbackOptions = {
+        onSuccess(response) {
+            if (response.ok) {
+                currentUserName = name;
+                alert('Имя изменено');
+            } else {
+                UI.settingsWindow.settingsList.chatName.setUserName(currentUserName);
+                alert('Что-то пошло не так.');
             }
-        })
-        return response;
-    } catch (error) {
-        alert(error)
-    }
+        },
+    };
+
+    await changeNameRequest(newName, callbackOptions);
 }
 
 function passAuthorization() {
@@ -160,13 +150,17 @@ function addListeners() {
 }
 
 async function init() {
-    const tokenResponse = await getTokenResponse();
-    if (tokenResponse.ok) {
-        let tokenResponseJSON = await tokenResponse.json();
-        successfulCodeConfirmHandler(tokenResponseJSON);
-    } else {
-        passAuthorization();
-    }
+    const callbackOptions = {
+        onSuccess(response) {
+            if (response.ok) {
+                successfulCodeConfirmHandler(response);
+            } else {
+                passAuthorization();
+            }
+        }
+    };
+    await tokenGetRequest(callbackOptions);
+
     UI.mainWindow.messageWrapper.scrollToEnd();
     addListeners();
 }
