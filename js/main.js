@@ -1,6 +1,12 @@
 import {CreateMessageElement, UI} from "./view.js";
 import {getCookie, setCookie, deleteCookie} from "./cookieManager.js";
-import {sendServerRequest, SendTokenRequest, tokenGetRequest, changeNameRequest, messageHistoryRequest} from "./network.js";
+import {
+    sendServerRequest,
+    SendTokenRequest,
+    tokenGetRequest,
+    changeNameRequest,
+    messageHistoryRequest
+} from "./network.js";
 
 const TOKEN = 'token';
 let currentUserName = '';
@@ -30,9 +36,17 @@ async function showMessageHistory() {
     const callbackOptions = {
         async onSuccess(response) {
             const responseJSON = await response.json();
-            alert(JSON.stringify(responseJSON));
+            responseJSON.messages.forEach(item => {
+                const messageOptions = {
+                    message: item.message,
+                    userName: item.username,
+                    createdAt: new Date(item.createdAt),
+                    myMessage: (item.username === currentUserName),
+                };
+                showMessage(messageOptions);
+            });
         }
-    }
+    };
     await messageHistoryRequest(callbackOptions);
 }
 
