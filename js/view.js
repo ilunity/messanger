@@ -1,7 +1,7 @@
 "use strict";
-const NAME_IN_CHAT = 'Я';
+import {format} from 'date-fns';
 
-function CreateMessageElement({text, author, time}) {
+function CreateMessageElement({message, userName, createdAt, myMessage = false}) {
     const messageClone = document.querySelector('#message-tmp').content.cloneNode(true);
 
     this.mainElement =  messageClone.querySelector('.message-item');
@@ -9,7 +9,7 @@ function CreateMessageElement({text, author, time}) {
     this.messageAuthorElement = this.mainElement.querySelector('.message-item__author');
     this.messageTimeElement = this.mainElement.querySelector('.message-item__time');
 
-    this.setText = function (text) {
+    this.setMessage = function (text) {
         this.messageTextElement.textContent = text;
     }
     this.markAsDelivered = function () {
@@ -18,17 +18,20 @@ function CreateMessageElement({text, author, time}) {
     this.markAsMyMessage = function () {
         this.mainElement.classList.add('message-item_my-message');
     }
+    this.setTime = function (date) {
+        this.messageTimeElement.textContent = format(date, 'HH:mm');
+    }
 
 
-    this.setText(text);
-    this.messageAuthorElement.textContent = author;
-    this.messageTimeElement.textContent = time;
+    this.setMessage(message);
+    this.setTime(createdAt);
+    this.messageAuthorElement.textContent = userName;
 
-    if (author !== NAME_IN_CHAT) {
-        this.markAsDelivered();
+    if (myMessage) {
+        this.markAsMyMessage();
     }
     else {
-        this.markAsMyMessage();
+        this.markAsDelivered();
     }
 }
 

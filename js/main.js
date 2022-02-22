@@ -2,7 +2,6 @@ import {CreateMessageElement, UI} from "./view.js";
 import {getCookie, setCookie, deleteCookie} from "./cookieManager.js";
 import {sendServerRequest, SendTokenRequest, tokenGetRequest, changeNameRequest, messageHistoryRequest} from "./network.js";
 
-const NAME_IN_CHAT = 'Я';
 const TOKEN = 'token';
 let currentUserName = '';
 let currentWindow;
@@ -17,13 +16,14 @@ function showMessage(messageOptions) {
 
 function sendMessage() {
     const messageOptions = {
-        text: UI.mainWindow.messageForm.getText(),
-        author: NAME_IN_CHAT,
-        time: getCurrentTime(),
+        message: UI.mainWindow.messageForm.getText(),
+        userName: currentUserName,
+        createdAt: new Date(),
+        myMessage: true,
     }
     UI.mainWindow.messageForm.resetForm();
 
-    showMessage();
+    showMessage(messageOptions);
 }
 
 async function showMessageHistory() {
@@ -34,16 +34,6 @@ async function showMessageHistory() {
         }
     }
     await messageHistoryRequest(callbackOptions);
-}
-
-function getCurrentTime() {
-    const date = new Date();
-    const hours = date.getHours();
-    const minutes = date.getMinutes();
-
-    const timeString = `${hours}:${minutes}`;
-
-    return timeString;
 }
 
 function toggleWindow(window) {
