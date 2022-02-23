@@ -117,13 +117,13 @@ async function changeName() {
             if (response.ok) {
                 currentUserName = name;
                 alert('Имя изменено');
+                location.reload();
             } else {
                 UI.settingsWindow.settingsList.chatName.setUserName(currentUserName);
                 alert('Что-то пошло не так.');
             }
         },
     };
-
     await changeNameRequest(newName, callbackOptions);
 }
 
@@ -138,6 +138,10 @@ function addListeners() {
     UI.mainWindow.settingsBtn.addEventListener('click', () => {
         toggleWindow(UI.settingsWindow);
     });
+    UI.mainWindow.exitBtn.addEventListener('click', () => {
+        deleteCookie(TOKEN);
+        location.reload();
+    });
 
     UI.settingsWindow.closeBtn.addEventListener('click', () => {
         toggleWindow(UI.mainWindow);
@@ -145,9 +149,8 @@ function addListeners() {
     UI.settingsWindow.settingsList.chatName.form.mainElement.addEventListener('submit', () => {
         changeName();
     });
-    UI.mainWindow.exitBtn.addEventListener('click', () => {
-        deleteCookie(TOKEN);
-        location.reload();
+    UI.settingsWindow.settingsList.chatName.form.textElement.addEventListener('blur', () => {
+        UI.settingsWindow.settingsList.chatName.setUserName(currentUserName);
     });
 
     UI.authorizationWindow.authorizationList.email.form.mainElement.addEventListener('submit', authorizationHandler);

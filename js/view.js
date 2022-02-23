@@ -43,9 +43,6 @@ const UI = {
             getText() {
                 return this.textElement.value;
             },
-            resetForm() {
-                this.mainElement.reset();
-            },
             resizeTextElement() {
                 //todo сделать адаптивным
                 const defaultHeight = 32;
@@ -58,6 +55,10 @@ const UI = {
                             newHeight;
 
                 this.textElement.style.height = `${newHeight}px`;
+            },
+            resetForm() {
+                this.mainElement.reset();
+                this.resizeTextElement();
             },
         },
         settingsBtn: document.querySelector('.main-window__settings-btn'),
