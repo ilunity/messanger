@@ -47,7 +47,7 @@ async function showMessageHistory() {
 
 function onMessageHandler(data) {
     const messageOptions = {
-        message: data.text,
+        message: data.message,
         userName: data.user.name,
         createdAt: new Date(data.createdAt),
         myMessage: (data.user.email === currentEmail),

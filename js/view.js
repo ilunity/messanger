@@ -146,5 +146,14 @@ const UI = {
 UI.mainWindow.messageForm.textElement.addEventListener('input', () => {
     UI.mainWindow.messageForm.resizeTextElement();
 });
+UI.mainWindow.messageForm.textElement.addEventListener('keydown', (event) => {
+    if (event.code === "Enter") {
+        if (!event.shiftKey) {
+            const submitEvent = new Event('submit');
+            UI.mainWindow.messageForm.mainElement.dispatchEvent(submitEvent);
+            event.preventDefault();
+        }
+    }
+});
 
 export {CreateMessageElement, UI};
