@@ -1,7 +1,10 @@
 import {getCookie} from "./cookieManager.js";
 
+const TOKEN = 'token';
 const hostName = 'https://chat1-341409.oa.r.appspot.com/';
+const webSocketUrl = 'ws://chat1-341409.oa.r.appspot.com/websockets?';
 
+let socket;
 
 async function sendServerRequest(requestPath, {method, body}, {onSuccess, onError}) {
     const url = hostName + requestPath;
@@ -16,7 +19,7 @@ async function sendServerRequest(requestPath, {method, body}, {onSuccess, onErro
     }
 
     if (method !== 'POST') {
-        const token = getCookie('token');
+        const token = getCookie(TOKEN);
         fetchOptions.headers['Authorization'] = `Bearer ${token}`;
     }
     if (body !== undefined) {
@@ -33,7 +36,7 @@ async function sendServerRequest(requestPath, {method, body}, {onSuccess, onErro
     }
 }
 
-async function SendTokenRequest(emailName, callbackOptions) {
+async function sendTokenRequest(emailName, callbackOptions) {
     const pathRequest = `api/user`;
     const emailJSON = JSON.stringify({email: emailName});
 
@@ -60,4 +63,40 @@ async function messageHistoryRequest(callbackOptions) {
     await sendServerRequest(requestPath, {method: 'GET'}, callbackOptions);
 }
 
-export {sendServerRequest, SendTokenRequest, tokenGetRequest, changeNameRequest, messageHistoryRequest};
+function getWebSocket() {
+    if (socket === undefined) {
+        const token = getCookie(TOKEN);
+        const fullUrl = webSocketUrl + token;
+
+        socket = new WebSocket(fullUrl);
+    }
+
+    return socket;
+}
+
+function socketSendMessage(text) {
+    const socket = getWebSocket();
+    const textJSON = JSON.stringify({text});
+
+    socket.send(textJSON);
+}
+
+function socketOnMessageHandler(handler) {
+    const socket = getWebSocket();
+
+    socket.onmessage = function (event) {
+        const dataJSON = JSON.parse(event.data);
+        handler(dataJSON);
+    }
+}
+
+export {
+    sendServerRequest,
+    sendTokenRequest,
+    tokenGetRequest,
+    changeNameRequest,
+    messageHistoryRequest,
+    getWebSocket,
+    socketSendMessage,
+    socketOnMessageHandler
+};

@@ -4,7 +4,7 @@ import {format} from 'date-fns';
 function CreateMessageElement({message, userName, createdAt, myMessage = false}) {
     const messageClone = document.querySelector('#message-tmp').content.cloneNode(true);
 
-    this.mainElement =  messageClone.querySelector('.message-item');
+    this.mainElement = messageClone.querySelector('.message-item');
     this.messageTextElement = this.mainElement.querySelector('.message-item__message');
     this.messageAuthorElement = this.mainElement.querySelector('.message-item__author');
     this.messageTimeElement = this.mainElement.querySelector('.message-item__time');
@@ -29,8 +29,7 @@ function CreateMessageElement({message, userName, createdAt, myMessage = false})
 
     if (myMessage) {
         this.markAsMyMessage();
-    }
-    else {
+    } else {
         this.markAsDelivered();
     }
 }
@@ -47,6 +46,19 @@ const UI = {
             resetForm() {
                 this.mainElement.reset();
             },
+            resizeTextElement() {
+                //todo сделать адаптивным
+                const defaultHeight = 32;
+                const maxHeight = 84;
+                this.textElement.style.height = `${defaultHeight}px`;
+
+                let newHeight = this.textElement.scrollHeight;
+                newHeight = newHeight < defaultHeight ? defaultHeight:
+                            newHeight > maxHeight ? maxHeight:
+                            newHeight;
+
+                this.textElement.style.height = `${newHeight}px`;
+            },
         },
         settingsBtn: document.querySelector('.main-window__settings-btn'),
         exitBtn: document.querySelector('.main-window__exit-btn'),
@@ -58,7 +70,7 @@ const UI = {
                 this.mainElement.scrollTop = scrollHeight;
             },
         },
-        changeVisibility () {
+        changeVisibility() {
             this.mainElement.classList.toggle('main-window_nonactive');
         },
     },
@@ -84,7 +96,7 @@ const UI = {
             },
         },
         closeBtn: document.querySelector('.settings-window__close-btn'),
-        changeVisibility () {
+        changeVisibility() {
             this.mainElement.classList.toggle('settings-window_nonactive');
         },
     },
@@ -107,7 +119,7 @@ const UI = {
             },
         },
         closeBtn: document.querySelector('.authorization-window__close-btn'),
-        changeVisibility () {
+        changeVisibility() {
             this.mainElement.classList.toggle('authorization-window_nonactive');
         },
     },
@@ -124,10 +136,14 @@ const UI = {
             },
         },
         closeBtn: document.querySelector('.confirm-window__close-btn'),
-        changeVisibility () {
+        changeVisibility() {
             this.mainElement.classList.toggle('confirm-window_nonactive');
         },
     },
 }
+
+UI.mainWindow.messageForm.textElement.addEventListener('input', () => {
+    UI.mainWindow.messageForm.resizeTextElement();
+});
 
 export {CreateMessageElement, UI};

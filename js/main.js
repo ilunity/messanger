@@ -1,15 +1,17 @@
 import {CreateMessageElement, UI} from "./view.js";
-import {getCookie, setCookie, deleteCookie} from "./cookieManager.js";
+import {setCookie, deleteCookie} from "./cookieManager.js";
 import {
-    sendServerRequest,
-    SendTokenRequest,
+    sendTokenRequest,
     tokenGetRequest,
     changeNameRequest,
-    messageHistoryRequest
+    messageHistoryRequest,
+    socketSendMessage,
+    socketOnMessageHandler,
 } from "./network.js";
 
 const TOKEN = 'token';
-let currentUserName = '';
+let currentUserName = undefined;
+let currentEmail = undefined;
 let currentWindow;
 
 function showMessage(messageOptions) {
@@ -21,33 +23,36 @@ function showMessage(messageOptions) {
 }
 
 function sendMessage() {
-    const messageOptions = {
-        message: UI.mainWindow.messageForm.getText(),
-        userName: currentUserName,
-        createdAt: new Date(),
-        myMessage: true,
-    }
+    const message = UI.mainWindow.messageForm.getText();
     UI.mainWindow.messageForm.resetForm();
-
-    showMessage(messageOptions);
+    socketSendMessage(message);
 }
 
 async function showMessageHistory() {
-    const callbackOptions = {
-        async onSuccess(response) {
-            const responseJSON = await response.json();
-            responseJSON.messages.forEach(item => {
-                const messageOptions = {
-                    message: item.message,
-                    userName: item.username,
-                    createdAt: new Date(item.createdAt),
-                    myMessage: (item.username === currentUserName),
-                };
-                showMessage(messageOptions);
-            });
-        }
-    };
+    const callbackOptions = {};
+    callbackOptions.onSuccess = async function (response) {
+        const responseJSON = await response.json();
+        responseJSON.messages.forEach(item => {
+            const messageOptions = {
+                message: item.message,
+                userName: item.username,
+                createdAt: new Date(item.createdAt),
+                myMessage: (item.username === currentUserName),
+            };
+            showMessage(messageOptions);
+        });
+    }
     await messageHistoryRequest(callbackOptions);
+}
+
+function onMessageHandler(data) {
+    const messageOptions = {
+        message: data.text,
+        userName: data.user.name,
+        createdAt: new Date(data.createdAt),
+        myMessage: (data.user.email === currentEmail),
+    };
+    showMessage(messageOptions);
 }
 
 function toggleWindow(window) {
@@ -71,7 +76,7 @@ async function authorizationHandler() {
             alert('Код отправлен.');
         }
     }
-    await SendTokenRequest(emailName, callbackOptions);
+    await sendTokenRequest(emailName, callbackOptions);
 
     toggleWindow(UI.codeConfirmWindow);
 }
@@ -95,8 +100,11 @@ async function codeConfirmHandler() {
 async function successfulCodeConfirmHandler(tokenResponse) {
     const responseJSON = await tokenResponse.json();
     await showMessageHistory();
+    socketOnMessageHandler(onMessageHandler);
+
     toggleWindow(UI.mainWindow)
 
+    currentEmail = responseJSON.email;
     currentUserName = responseJSON.name;
     UI.settingsWindow.settingsList.chatName.setUserName(currentUserName);
 }
