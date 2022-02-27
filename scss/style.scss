@@ -50,14 +50,6 @@ body {
     border: 1px solid black;
     padding: 5px;
   }
-  &__messages-wrapper {
-    height: 100%;
-    width: 100%;
-
-    overflow-y: scroll;
-    margin-bottom: 8px;
-    border: 1px solid black;
-  }
   &__messages {
     width: 100%;
     min-height: 100%;
@@ -75,6 +67,28 @@ body {
   flex-direction: column;
   align-items: start;
 }
+
+.messages-wrapper {
+  height: 100%;
+  width: 100%;
+
+  overflow-y: scroll;
+  margin-bottom: 8px;
+  border: 1px solid black;
+
+  position: relative;
+  &__messages-loaded-text {
+    width: 200px;
+    height: 40px;
+    margin: 7px auto 15px;
+    background-color: #F7F7F7;
+    border-radius: 5px;
+    text-align: center;;
+    line-height: 40px;
+  }
+
+}
+
 
 .message-item {
   &_my-message {

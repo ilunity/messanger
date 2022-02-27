@@ -8,18 +8,24 @@ import {
     socketSendMessage,
     socketOnMessageHandler,
 } from "./network.js";
+import {messagesStorage} from "./storage.js";
 
 const TOKEN = 'token';
+const LOADING_MESSAGE_COUNT = 20;
 let currentUserName = undefined;
 let currentEmail = undefined;
 let currentWindow;
 
-function showMessage(messageOptions) {
+function showMessage(messageOptions, isNewMessage = true) {
     const message = new CreateMessageElement(messageOptions);
     const messageNode = message.mainElement;
 
-    UI.mainWindow.messagesList.append(messageNode);
-    UI.mainWindow.messageWrapper.scrollToEnd();
+    if (isNewMessage) {
+        UI.mainWindow.messagesList.append(messageNode);
+        if (UI.mainWindow.isPositioningForNewMessages) UI.mainWindow.messageWrapper.scrollToEnd();
+    } else {
+        UI.mainWindow.messagesList.prepend(messageNode);
+    }
 }
 
 function sendMessage() {
@@ -28,31 +34,27 @@ function sendMessage() {
     socketSendMessage(message);
 }
 
-async function showMessageHistory() {
+function showMessageHistory(messagesCount = undefined) {
+    const messages = messagesStorage.loadMessages(messagesCount);
+    messages.forEach(item => {
+        const messageOptions = {
+            message: item.text,
+            userName: item.user.name,
+            createdAt: new Date(item.createdAt),
+            myMessage: (item.user.email === currentEmail),
+        };
+        showMessage(messageOptions, false);
+    });
+}
+
+async function loadMessageHistory() {
     const callbackOptions = {};
     callbackOptions.onSuccess = async function (response) {
         const responseJSON = await response.json();
-        responseJSON.messages.forEach(item => {
-            const messageOptions = {
-                message: item.message,
-                userName: item.username,
-                createdAt: new Date(item.createdAt),
-                myMessage: (item.username === currentUserName),
-            };
-            showMessage(messageOptions);
-        });
+        const messages = responseJSON.messages;
+        messagesStorage.saveMessages(messages);
     }
     await messageHistoryRequest(callbackOptions);
-}
-
-function onMessageHandler(data) {
-    const messageOptions = {
-        message: data.message,
-        userName: data.user.name,
-        createdAt: new Date(data.createdAt),
-        myMessage: (data.user.email === currentEmail),
-    };
-    showMessage(messageOptions);
 }
 
 function toggleWindow(window) {
@@ -97,16 +99,54 @@ async function codeConfirmHandler() {
     await tokenGetRequest(callbackOptions);
 }
 
+function onMessageHandler(data) {
+    const messageOptions = {
+        message: data.text,
+        userName: data.user.name,
+        createdAt: new Date(data.createdAt),
+        myMessage: (data.user.email === currentEmail),
+    };
+    showMessage(messageOptions);
+}
+
+function addLoadMessageHistoryListener() {
+    UI.mainWindow.messageWrapper.mainElement.addEventListener('scroll', scrollMessagesHandler);
+}
+
+function scrollMessagesHandler() {
+    const messagesWrapperYBottom = UI.mainWindow.messageWrapper.mainElement.getBoundingClientRect().bottom;
+    const messagesListYBottom = UI.mainWindow.messagesList.getBoundingClientRect().bottom;
+    const distanceToStartOfMessages = messagesListYBottom - messagesWrapperYBottom;
+    UI.mainWindow.isPositioningForNewMessages = (distanceToStartOfMessages < 10);
+
+    const messagesWrapperYTop = UI.mainWindow.messageWrapper.mainElement.getBoundingClientRect().top;
+    const endOfMessagesFrameYBottom = UI.mainWindow.endOfMessagesText.getBoundingClientRect().bottom;
+    const distanceToEndOfMessages = messagesWrapperYTop - endOfMessagesFrameYBottom;
+
+    if (distanceToEndOfMessages > 100) return;
+
+    showMessageHistory(LOADING_MESSAGE_COUNT);
+}
+
+// function scrollToLastHandler() {
+//     const messagesWrapperYBottom = UI.mainWindow.messageWrapper.mainElement.getBoundingClientRect().bottom;
+//     const messagesListYBottom = UI.mainWindow.messagesList.getBoundingClientRect().bottom;
+//     console.log(messagesWrapperYBottom + " " + messagesListYBottom);
+// }
+
 async function successfulCodeConfirmHandler(tokenResponse) {
     const responseJSON = await tokenResponse.json();
-    await showMessageHistory();
-    socketOnMessageHandler(onMessageHandler);
-
-    toggleWindow(UI.mainWindow)
-
     currentEmail = responseJSON.email;
     currentUserName = responseJSON.name;
     UI.settingsWindow.settingsList.chatName.setUserName(currentUserName);
+
+    await loadMessageHistory();
+    addLoadMessageHistoryListener();
+    showMessageHistory(LOADING_MESSAGE_COUNT);
+    socketOnMessageHandler(onMessageHandler);
+
+    toggleWindow(UI.mainWindow)
+    UI.mainWindow.messageWrapper.scrollToEnd();
 }
 
 async function changeName() {
@@ -130,6 +170,7 @@ async function changeName() {
 function passAuthorization() {
     toggleWindow(UI.codeConfirmWindow);
 }
+
 
 function addListeners() {
     UI.mainWindow.messageForm.mainElement.addEventListener('submit', () => {

@@ -29,7 +29,7 @@ async function sendServerRequest(requestPath, {method, body}, {onSuccess, onErro
 
     try {
         const response = await fetch(url, fetchOptions);
-        if (onSuccess !== undefined) onSuccess(response);
+        if (onSuccess !== undefined) await onSuccess(response);
         return response;
     } catch (error) {
         onError(error);

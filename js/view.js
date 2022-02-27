@@ -64,6 +64,8 @@ const UI = {
         settingsBtn: document.querySelector('.main-window__settings-btn'),
         exitBtn: document.querySelector('.main-window__exit-btn'),
         messagesList: document.querySelector('.main-window__messages'),
+        endOfMessagesText: document.querySelector('.messages-wrapper__messages-loaded-text'),
+        isPositioningForNewMessages: true,
         messageWrapper: {
             mainElement: document.querySelector('.main-window__messages-wrapper'),
             scrollToEnd() {
