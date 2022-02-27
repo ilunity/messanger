@@ -57,6 +57,20 @@ async function loadMessageHistory() {
     await messageHistoryRequest(callbackOptions);
 }
 
+function onMessageHandler(data) {
+    const messageOptions = {
+        message: data.text,
+        userName: data.user.name,
+        createdAt: new Date(data.createdAt),
+        myMessage: (data.user.email === currentEmail),
+    };
+    showMessage(messageOptions);
+}
+
+function addLoadMessageHistoryListener() {
+    UI.mainWindow.messageWrapper.mainElement.addEventListener('scroll', scrollMessagesHandler);
+}
+
 function toggleWindow(window) {
     if (currentWindow === window) {
         return;
@@ -97,20 +111,6 @@ async function codeConfirmHandler() {
         },
     };
     await tokenGetRequest(callbackOptions);
-}
-
-function onMessageHandler(data) {
-    const messageOptions = {
-        message: data.text,
-        userName: data.user.name,
-        createdAt: new Date(data.createdAt),
-        myMessage: (data.user.email === currentEmail),
-    };
-    showMessage(messageOptions);
-}
-
-function addLoadMessageHistoryListener() {
-    UI.mainWindow.messageWrapper.mainElement.addEventListener('scroll', scrollMessagesHandler);
 }
 
 function scrollMessagesHandler() {
@@ -170,7 +170,6 @@ async function changeName() {
 function passAuthorization() {
     toggleWindow(UI.codeConfirmWindow);
 }
-
 
 function addListeners() {
     UI.mainWindow.messageForm.mainElement.addEventListener('submit', () => {
